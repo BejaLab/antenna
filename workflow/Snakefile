@@ -1,0 +1,266 @@
+
+from snakemake.utils import min_version
+min_version("6.0")
+
+jgi_batches ,= glob_wildcards("data/jgi/{batch}/fasta.faa")
+gem_batches ,= glob_wildcards("data/gem/split/{batch}.fasta")
+
+crt_genes = [ "CrtZ", "CrtW", "CrtR", "BCD", "Lycopene_cycl", "TIGR02734.1" ]
+
+rule all:
+    input:
+        "output/map_om_rgc.pdf",
+        "output/map_jgi.pdf", "output/sum_jgi.pdf",
+        "output/car_gem.pdf", "output/sum_gem.pdf", "output/tax_gem.pdf"
+
+module blasso:
+    snakefile:
+        "BLASSO-Rhodopsin/workflow/Snakefile"
+    config:
+        config
+    prefix:
+        "blasso"
+
+use rule * from blasso  as blasso_*
+
+rule jgi_blasso_input:
+    input:
+        "refs/ref.fasta",
+        "data/jgi/{batch}/fasta.faa"
+    output:
+        "blasso/targets/{batch}.fasta"
+    wildcard_constraints:
+        batch = "batch\d+"
+    shell:
+        "cat {input} | tr ' ' _ > {output}"
+
+rule jgi_gene_info:
+    input:
+        "data/jgi/{batch}/gene_info.txt"
+    output:
+        "analysis/gene_info/{batch}.txt"
+    wildcard_constraints:
+        batch = "batch\d+"
+    shell:
+        "cp {input} {output}"
+
+rule copy_crt:
+    input:
+        "refs/{gene}.fasta"
+    output:
+        "analysis/refs/{gene}.fasta"
+    shell:
+        "cp {input} {output}"
+
+rule cat_refs:
+    input:
+        "refs/known.fasta", "refs/other.fasta"
+    output:
+        "analysis/refs/PRXR.fasta"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "seqkit rmdup -s -o {output} {input}"
+
+rule align:
+    input:
+        "analysis/refs/{profile}.fasta"
+    output:
+        "analysis/refs/{profile}.mafft"
+    conda:
+        "envs/tools.yaml"
+    threads:
+        10
+    shell:
+        "seqkit rmdup -s {input} | mafft --thread {threads} --auto - > {output}"
+
+rule to_a2m:
+    input:
+        "analysis/refs/{profile}.mafft"
+    output:
+        "analysis/refs/{profile}.sto"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "reformat.pl fas sto {input} {output} -M 50"
+
+rule hmmbuild:
+    input:
+        "analysis/refs/{profile}.sto"
+    output:
+        "analysis/refs/{profile}.hmm"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "hmmbuild {output} {input}"
+
+rule hmmalign:
+    input:
+        hmm = "analysis/refs/PRXR.hmm",
+        faa = "blasso/targets/{batch}.fasta"
+    output:
+        "analysis/hmmalign/{batch}.a3m"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "hmmalign --outformat A2M -o {output} {input.hmm} {input.faa}"
+
+rule reformat:
+    input:
+        "analysis/hmmalign/{batch}.a3m"
+    output:
+        "analysis/hmmalign/{batch}.a2m"
+    conda: # NB: scripts are not in path, so not taken from the environment
+        "envs/tools.yaml"
+    shell:
+        "reformat.pl {input} {output}"
+
+rule usearch_global:
+    input:
+        query = "blasso/targets/{batch}.fasta",
+        target = "analysis/refs/PRXR.fasta"
+    output:
+        "analysis/global/{batch}.tsv"
+    params:
+        id = 0.3,
+        query_cov = 0.6
+    threads:
+        10
+    shell:
+        "usearch -threads {threads} -usearch_global {input.query} -db {input.target} -id {params.id} -userout {output} -userfields query+target+id -query_cov {params.query_cov} -target_cov 0 -maxaccepts 1000000"
+
+rule parse:
+    input:
+        info = "analysis/gene_info/{prefix}.txt",
+        a2m = "analysis/hmmalign/{prefix}.a2m",
+        pos = "refs/pos.txt",
+        blasso = "blasso/output/{prefix}.tsv",
+        usearch = "analysis/global/{prefix}.tsv"
+    output:
+        "analysis/parse/{prefix}.tsv"
+    conda:
+        "envs/biopython.yaml"
+    script:
+        "scripts/parse.py"
+
+rule plot_gem:
+    input:
+        tsv = "analysis/parse/GEM.tsv",
+        crt = expand("analysis/hmmsearch/GEM-{batch}-{gene}.txt", batch = gem_batches, gene = crt_genes)
+    output:
+        tax = "output/tax_gem.pdf",
+        sum = "output/sum_gem.pdf",
+        car = "output/car_gem.pdf"
+    conda:
+        "envs/r.yaml"
+    script:
+        "scripts/plot_gem.R"
+
+rule plot_jgi:
+    input:
+        tsv = expand("analysis/parse/{batch}.tsv", batch = jgi_batches),
+        metadata = "metadata/jgi/JGI_IMG_Aquatic_Unrestricted.tsv"
+    output:
+        map = "output/map_jgi.pdf",
+        sum = "output/sum_jgi.pdf"
+    conda:
+        "envs/r.yaml"
+    script:
+        "scripts/plot_jgi.R"
+
+rule plot_om_rgc:
+    input:
+        tsv = "analysis/parse/OM-RGC.tsv",
+        metadata = "metadata/om-rgc/Salazar_et_al_2019_Suppl_Info.xlsx",
+        abundance = "analysis/abundance/OM-RGC.tsv"
+    output:
+        "output/map_om_rgc.pdf"
+    params:
+        sheet = "Table_W1"
+    conda:
+        "envs/r.yaml"
+    script:
+        "scripts/plot_om_rgc.R"
+
+rule om_rgc_rhodopsins:
+    input:
+        "data/om-rgc/OM-RGC_v2.tsv"
+    output:
+        "analysis/gene_info/OM-RGC.txt"
+    params:
+        NOG = "11G9N"
+    shell:
+        "awk -v N={params.NOG} -F\\\\t 'NR==1||$4==N' {input} > {output}"
+
+rule om_rgc_abundance:
+    input:
+        tsv = "analysis/gene_info/OM-RGC.txt",
+        abundance = "data/om-rgc/OM-RGC_v2_gene_profile_metaG.tsv"
+    output:
+        "analysis/abundance/OM-RGC.tsv"
+    shell:
+        "cut -f2 {input.tsv} | sed s/OM-RGC_ID/OMRGC_ID/ | grep -f- {input.abundance} > {output}"
+
+rule blasso_targets_om_rgc:
+    input:
+        ref = "refs/ref.fasta",
+        txt = "analysis/gene_info/OM-RGC.txt"
+    output:
+        "blasso/targets/OM-RGC.fasta"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "csvtool -t TAB -u TAB namedcol OM-RGC_ID,sequence {input.txt} | tail -n+2 | seqkit tab2fx | seqkit translate | cat {input.ref} - > {output}"
+
+rule gem_gene_info:
+    input:
+        "metadata/gem/genome_metadata.tsv"
+    output:
+        "analysis/gene_info/GEM.txt"
+    shell:
+        "cp {input} {output}"
+
+rule hmmsearch_gem:
+    input:
+        fasta = "data/gem/split/{batch}.fasta",
+        hmm = "analysis/refs/{profile}.hmm"
+    output:
+        "analysis/hmmsearch/GEM-{batch}-{profile}.txt"
+    params:
+        E = 1
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "hmmsearch -E {params.E} -o /dev/null --tblout {output} {input.hmm} {input.fasta}"
+
+rule faidx:
+    input:
+        "{fasta}"
+    output:
+        "{fasta}.fai"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "seqkit faidx {input}"
+
+rule blasso_targets_gem:
+    input:
+        "refs/ref.fasta",
+        expand("analysis/hmmsearch/GEM-{batch}-PRXR.fasta", batch = gem_batches)
+    output:
+        "blasso/targets/GEM.fasta"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "cat {input} > {output}"
+
+rule extract_gem_targets:
+    input:
+        fasta = "data/gem/split/{batch}.fasta",
+        txt = "analysis/hmmsearch/GEM-{batch}-PRXR.txt"
+    output:
+        "analysis/hmmsearch/GEM-{batch}-PRXR.fasta"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "grep -v '^#' {input.txt} | cut -f1 -d' ' | sort -u | xargs seqkit faidx {input.fasta} > {output}"
