@@ -10,3 +10,4 @@ dependencies:
  - r-maps=3.4.0
  - r-scatterpie=0.1.6
  - r-ggrepel=0.9.1
+ - r-rvcheck=0.1.8

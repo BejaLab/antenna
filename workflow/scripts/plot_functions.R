@@ -4,41 +4,44 @@ library(dplyr)
 library(tidyr)
 library(tibble)
 library(ggseqlogo)
+library(rvcheck)
 library(scatterpie)
 library(ggforce)
+library(ggrepel)
+library(grid)
 
-cols <- c(
-    A = 'orange',
-    B = 'black',
-    C = 'purple',
-    D = 'purple',
-    E = 'purple',
-    F = '#f89f56',
-    G = '#cc00cc',
-    H = 'purple',
-    I = 'black',
-    J = 'black',
-    K = 'purple',
-    L = 'purple',
-    M = 'purple',
-    N = 'purple',
-    O = 'black',
-    P = 'green',
-    Q = 'purple',
-    R = 'purple',
-    S = 'orange',
-    T = 'orange',
-    U = 'black',
-    V = 'orange',
-    W = '#f89f56',
-    Y = '#f89f56',
+res.cols <- c(
+    A = 'gray',
+    B = 'gray',
+    C = 'gray',
+    D = 'gray',
+    E = 'gray',
+    F = '#005bbb',
+    G = '#ffd500',
+    H = 'gray',
+    I = '#005bbb',
+    J = 'gray',
+    K = 'gray',
+    L = '#cc00cc',
+    M = 'gray',
+    N = 'gray',
+    O = 'gray',
+    P = 'gray',
+    Q = 'gray',
+    R = 'gray',
+    S = 'gray',
+    T = 'gray',
+    U = 'gray',
+    V = 'gray',
+    W = '#005bbb',
+    Y = '#005bbb',
 
-    x = 'red',
-    z = 'black',
-    p = 'green'
+    x = '#d33600',
+    z = '#686868',
+    p = '#800080'
 )
 
-all_ecosystems <- c("Marine", "Coastal", "Freshwater", "Saline")
+all_ecosystems <- c("Marine" = "#1500aa", "Coastal" = "#00daff", "Freshwater" = "#01cf00", "Saline" = "#a020f0")
 
 my_ecosystem <- function(.data) {
     coastal_specific  <- c("Estuary", "Salt marsh", "Mangrove swamp", "Microbial mats", "Salt marsh, Tidal flats", "Beach", "Coral reef", "Intertidal zone")
@@ -50,7 +53,7 @@ my_ecosystem <- function(.data) {
             Ecosystem.Type == "Marine" ~ "Marine",
             Ecosystem.Type == "Non-marine Saline and Alkaline" ~ "Saline",
             T ~ NA_character_)) %>%
-        mutate(Ecosystem = factor(Ecosystem, levels = all_ecosystems)) %>%
+        mutate(Ecosystem = factor(Ecosystem, levels = names(all_ecosystems))) %>%
         filter(!is.na(Ecosystem), !grepl("sediment", Specific.Ecosystem, i = T))
 }
 
@@ -69,12 +72,12 @@ my_logo_matrix <- function(.data) {
         select(one_of("x", "y"), Ecosystem) %>%
         as.list
     color <- with(meta, case_when(
-        Ecosystem == "Freshwater" ~ "green",
-        Ecosystem == "Marine"     ~ "blue",
-        Ecosystem == "Saline"     ~ "purple",
-        Ecosystem == "Coastal"    ~ "cyan"
+        Ecosystem == "Freshwater" ~ all_ecosystems[["Freshwater"]],
+        Ecosystem == "Marine"     ~ all_ecosystems[["Marine"]],
+        Ecosystem == "Saline"     ~ all_ecosystems[["Saline"]],
+        Ecosystem == "Coastal"    ~ all_ecosystems[["Coastal"]]
     ))
-    cs <- make_col_scheme(chars = names(cols), cols = cols)
+    cs <- make_col_scheme(chars = names(res.cols), cols = res.cols)
     win <- spread(.data, window, Abundance, fill = 0) %>%
         select(-one_of("x", "y"), -Ecosystem) %>%
         column_to_rownames("class") %>% t
@@ -84,7 +87,7 @@ my_logo_matrix <- function(.data) {
         `rownames<-`(names(tot))
     mat <- rbind(win.pct, tot.pct)
     mat[is.nan(mat)] <- 0
-    p <- ggseqlogo(mat, method = 'custom', namespace = names(cols), col_scheme = cs) +
+    p <- ggseqlogo(mat, method = 'custom', namespace = names(res.cols), col_scheme = cs) +
         theme_void() +
         coord_cartesian(ylim = c(-1,1)) +
         theme(plot.background = element_rect(fill = "#FFFFFF88", color = color))
@@ -104,7 +107,7 @@ my_add_grob_to_ecosystem <- function(.p, .logo) {
 }
 
 my_ggplot_ecosystems <- function(e) {
-    ecosystem_df <- data.frame(Ecosystem = factor(all_ecosystems, levels = all_ecosystems), y = 1)
+    ecosystem_df <- data.frame(Ecosystem = factor(names(all_ecosystems), levels = names(all_ecosystems)), y = 1)
     ggplot(ecosystem_df, aes(x = Ecosystem, y = y)) +
         geom_blank() +
         ylim(c(-1, 1)) +
@@ -115,7 +118,8 @@ my_ggplot_world <- function() {
     world <- map_data("world")
     ggplot(world) +
         geom_map(data = world, map = world, aes(long, lat, map_id = region), color = "black", fill = "lightgray", size = 0.1) +
-        coord_equal()
+        coord_equal() +
+        xlim(c(-180, 180))
 }
 
 get_repel_coords <- function(.data, map_g, width, height) {
@@ -123,7 +127,7 @@ get_repel_coords <- function(.data, map_g, width, height) {
     pushViewport(viewport(width = width, height = height))
     g <- map_g +
         geom_point(aes(x, y), data = .data) +
-        geom_text_repel(aes(x, y, size = Total), label = "O", data = .data, box.padding = 8, max.overlaps = Inf)
+        geom_text_repel(aes(x, y, size = Total), size = 3, label = ".", data = .data, box.padding = 8, max.overlaps = Inf)
     panel_params <- ggplot_build(g)$layout$panel_params[[1]]
     xrg <- panel_params$x.range
     yrg <- panel_params$y.range
@@ -147,17 +151,22 @@ get_repel_coords <- function(.data, map_g, width, height) {
         mutate(theta = atan2(y - y.repel, x - x.repel), x.segm = x.repel + Total * cos(theta), y.segm = y.repel + Total * sin(theta))
 }
 
-my_pies <- function(.data, res.cols = c("G", "WF"), width, height) {
+my_pies <- function(.data, width, height, repel = T) {
     .data <- by_location
     g <- my_ggplot_world()
-    .data <- get_repel_coords(.data, g, width, height)
+    if (repel) {
+        .data <- get_repel_coords(.data, g, width, height)
+    } else {
+        .data <- mutate(.data, x.repel = x, y.repel = y, x.segm = x, y.segm = y)
+    }
+    win.cols <- c(WF = res.cols[["W"]], G = res.cols[["G"]])
     g +
         geom_segment(aes(x = x.segm, y = y.segm, xend = x, yend = y, color = Ecosystem), data = .data, arrow = arrow(length = unit(0.01, "npc"))) +
-        geom_scatterpie(aes(x = x.repel, y = y.repel, r = Total), data = .data, color = NA, cols = res.cols, alpha = .8) +
+        geom_scatterpie(aes(x = x.repel, y = y.repel, r = Total), data = .data, color = NA, cols = c("G", "WF")) +
         geom_circle(aes(x0 = x.repel, y0 = y.repel, r = Total, color = Ecosystem), data = .data) +
         geom_scatterpie_legend(.data$Total, x = -140, y = -70) +
-	scale_fill_manual(values = c(G = '#cc00cc', WF = '#f89f56')) +
-        scale_color_manual(values = c(Freshwater = "green", "Marine" = "blue", "Saline" = "purple", "Coastal" = "cyan")) +
+	scale_fill_manual(values = win.cols) +
+        scale_color_manual(values = all_ecosystems) +
         theme_bw() +
         theme(axis.title.x = element_blank(), axis.title.y = element_blank())
 }

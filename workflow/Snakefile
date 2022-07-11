@@ -174,7 +174,8 @@ rule plot_om_rgc:
         metadata = "metadata/om-rgc/Salazar_et_al_2019_Suppl_Info.xlsx",
         abundance = "analysis/abundance/OM-RGC.tsv"
     output:
-        "output/map_om_rgc.pdf"
+        map = "output/map_om_rgc.pdf",
+        sum = "output/sum_om_rgc.pdf"
     params:
         sheet = "Table_W1"
     conda:

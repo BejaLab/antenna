@@ -54,7 +54,6 @@ height <- 8
 p <- my_pies(by_location, width, height)
 ggsave(map_file, p, height = height, width = width)
 
-
 p <- my_ggplot_ecosystems()
 p <- Reduce(my_add_grob_to_ecosystem, by_ecosystem, p)
-ggsave(sum_file, p, height = 8, width = 16)
+ggsave(sum_file, p, height = 3, width = 4)
