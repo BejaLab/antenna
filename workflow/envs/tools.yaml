@@ -6,3 +6,5 @@ dependencies:
  - mafft=7.505
  - hhsuite=3.3.0
  - seqkit=2.2.0
+ - trimal=1.4.1
+ - iqtree=2.2.0.3

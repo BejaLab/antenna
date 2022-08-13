@@ -4,6 +4,7 @@ snakemake@source("plot_functions.R")
 with(snakemake@input, {
     tsv_file  <<- tsv
     crt_files <<- crt
+    colors_file <<- colors
 })
 with(snakemake@output, {
 #    map_file <<- map
@@ -17,6 +18,10 @@ aliases <- list(
     Lycopene_cycl = "CrtY",
     crtI_fam = "CrtI"
 )
+
+taxa <- read.table(colors_file, sep = "\t", comment.char = "") %>%
+    arrange(V1) %>%
+    with(setNames(V2,V1))
 
 genes <- lapply(crt_files, read.table) %>%
     bind_rows %>%
@@ -51,6 +56,7 @@ by_ecosystem <- group_by(data, class, window, Ecosystem) %>%
     group_split %>%
     lapply(my_logo_matrix)
 
+aliases <- list(Cyanobacteriota = "Cyanobacteria")
 by_taxa <- distinct(all_data, otu_id, .keep_all = T) %>%
     separate_rows(Taxonomy, sep = ";") %>%
     filter(class %in% c("x", "p"), window_type %in% c("WF", "G")) %>%
@@ -59,7 +65,16 @@ by_taxa <- distinct(all_data, otu_id, .keep_all = T) %>%
     group_by(class, window_type, Ecosystem, Name) %>%
     summarize(Abundance = sum(Abundance), .groups = "drop") %>%
     group_by(Name) %>%
-    mutate(Name = ifelse(sum(Abundance) > 10, Name, NA))
+    mutate(Name = ifelse(sum(Abundance) > 10, Name, NA)) %>%
+    mutate(Name = recode(Name, !!!aliases))
+
+all_taxa <- unique(na.omit(by_taxa$Name))
+missing_taxa <- all_taxa[! all_taxa %in% names(taxa)]
+if (length(missing_taxa) > 0) {
+    write("Taxa not in the color file:", stderr())
+    write(missing_taxa, stderr())
+    q()
+}
 
 by_gene <- all_data %>%
     filter(class %in% c("x", "p"), window_type %in% c("WF", "G")) %>%
@@ -71,12 +86,15 @@ by_gene <- all_data %>%
     summarize(n = n())
 p <- ggplot(by_gene, aes(x = gene, fill = present, y = n)) +
     geom_bar(position = "stack", stat = "identity") +
-    facet_grid(class ~ window_type)
+    facet_grid(class ~ window_type) +
+    theme_bw()
 ggsave(car_file, p)
 
 p <- ggplot(by_taxa, aes(fill = Name, x = Ecosystem, y = Abundance)) +
-    geom_bar(position = "stack", stat="identity") +
-    facet_grid(class ~ window_type)
+    geom_bar(position = "stack", stat = "identity") +
+    scale_fill_manual(values = taxa) +
+    facet_grid(class ~ window_type) +
+    theme_bw()
 ggsave(tax_file, p)
 
 p <- my_ggplot_ecosystems()

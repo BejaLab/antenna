@@ -11,3 +11,13 @@ dependencies:
  - r-scatterpie=0.1.6
  - r-ggrepel=0.9.1
  - r-rvcheck=0.1.8
+ - bioconductor-treeio=1.16.1
+ - bioconductor-ggtree=3.0.1
+ - r-ape=5.6
+ - r-phytools=1.0_3
+ - r-phangorn=2.9.0
+ - bioconductor-biostrings=2.62.0
+ - r-svglite
+ - r-ggnewscale=0.4.7
+ - r-castor=1.7.2
+ - r-car=3.1_0

@@ -4,6 +4,7 @@ from Bio import SeqIO
 from sys import stderr
 import csv
 import re
+from crc64iso.crc64iso import crc64
 
 info_file = str(snakemake.input['info'])
 a2m_file = str(snakemake.input['a2m'])
@@ -15,31 +16,24 @@ out_file = str(snakemake.output)
 infos = dict()
 data_type = 'JGI'
 header = []
+id_cols = { 'OM-RGC_ID', 'genome_id', 'gene_oid', 'ID' }
 with open(info_file) as fh:
     tsv = csv.reader(fh, delimiter = '\t')
     header = next(tsv)
     header = [v + str(header[:i].count(v) + 1) if header.count(v) > 1 else v for i, v in enumerate(header)]
-    if 'OM-RGC_ID' in header:
-        data_type = 'OM-RGC'
-    elif 'genome_id' in header:
-        data_type = 'GEM'
+    id_cols = set(header) & id_cols
+    assert len(id_cols) > 0, "Id column not found"
+    id_col = id_cols.pop()
+    has_sequence = 'sequence' in header
     for line in tsv:
         row = dict(zip(header, line))
-        if data_type == 'OM-RGC':
-            record_id = row.pop('OM-RGC_ID')
+        record_id = row.pop(id_col).replace(' ', '_')
+        if has_sequence:
             del row['sequence']
-        elif data_type == 'GEM':
-            record_id = row.pop('genome_id')
-        else:
-            record_id = row.pop('gene_oid').replace(' ', '_')
         infos[record_id] = row
-    if data_type == 'OM-RGC':
-        header.remove('OM-RGC_ID')
+    header.remove(id_col)
+    if has_sequence:
         header.remove('sequence')
-    elif data_type == 'GEM':
-        header.remove('genome_id')
-    else:
-        header.remove('gene_oid')
 
 positions = dict()
 with open(pos_file) as fh:
@@ -71,7 +65,7 @@ with open(usearch_file) as fh:
 aminoacids = [ 'A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y' ]
 with open(out_file, 'w') as out_fh:
     tsv = csv.writer(out_fh, delimiter = "\t")
-    tsv.writerow([ 'record_id', 'positions', 'target', 'family', 'ident', 'wl_mean', 'wl_sd' ] + header)
+    tsv.writerow([ 'record_id', 'positions', 'checksum', 'target', 'family', 'ident', 'wl_mean', 'wl_sd' ] + header)
     with open(a2m_file) as a2m_fh:
         a2m = SeqIO.parse(a2m_fh, 'fasta')
         ref = next(a2m)
@@ -85,6 +79,8 @@ with open(out_file, 'w') as out_fh:
                 ref_pos += 1
         for rec in a2m:
             if rec.id in matches:
+                seq = re.sub('[^A-Z]', '', str(rec.seq))
+                cks = crc64(seq)
                 match  = matches[rec.id]
                 blasso = blassos[rec.id]
                 info_id, *rest = rec.id.split('/')
@@ -98,6 +94,6 @@ with open(out_file, 'w') as out_fh:
                     elif rec.seq[pos] != expected:
                         break
                 else:
-                    row = [ rec.id, ''.join(res), match['target'], match['family'], match['ident'], blasso['wl_mean'], blasso['wl_sd'] ]
+                    row = [ rec.id, ''.join(res), cks, match['target'], match['family'], match['ident'], blasso['wl_mean'], blasso['wl_sd'] ]
                     row += info.values()
                     tsv.writerow(row)

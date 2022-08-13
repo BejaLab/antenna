@@ -11,7 +11,8 @@ rule all:
     input:
         "output/map_om_rgc.pdf",
         "output/map_jgi.pdf", "output/sum_jgi.pdf",
-        "output/car_gem.pdf", "output/sum_gem.pdf", "output/tax_gem.pdf"
+        "output/car_gem.pdf", "output/sum_gem.pdf", "output/tax_gem.pdf",
+        "output/rhodopsins_small.svg"
 
 module blasso:
     snakefile:
@@ -22,6 +23,24 @@ module blasso:
         "blasso"
 
 use rule * from blasso  as blasso_*
+
+rule phylogeny_input:
+    input:
+        "refs/ref.fasta",
+        "input/rhodopsins.fasta",
+        "input/outgroups.fasta"
+    output:
+        "blasso/targets/phylogeny.fasta"
+    shell:
+        "cat {input} > {output}"
+
+rule phylogeny_gene_info:
+    input:
+        "input/rhodopsins.tsv"
+    output:
+        "analysis/gene_info/phylogeny.txt"
+    shell:
+        "cp {input} {output}"
 
 rule jgi_blasso_input:
     input:
@@ -146,13 +165,14 @@ rule parse:
 rule plot_gem:
     input:
         tsv = "analysis/parse/GEM.tsv",
-        crt = expand("analysis/hmmsearch/GEM-{batch}-{gene}.txt", batch = gem_batches, gene = crt_genes)
+        crt = expand("analysis/hmmsearch/GEM-{batch}-{gene}.txt", batch = gem_batches, gene = crt_genes),
+        colors = "metadata/taxa.txt"
     output:
         tax = "output/tax_gem.pdf",
         sum = "output/sum_gem.pdf",
         car = "output/car_gem.pdf"
     conda:
-        "envs/r.yaml"
+        "envs/r_plot.yaml"
     script:
         "scripts/plot_gem.R"
 
@@ -164,7 +184,7 @@ rule plot_jgi:
         map = "output/map_jgi.pdf",
         sum = "output/sum_jgi.pdf"
     conda:
-        "envs/r.yaml"
+        "envs/r_plot.yaml"
     script:
         "scripts/plot_jgi.R"
 
@@ -172,16 +192,35 @@ rule plot_om_rgc:
     input:
         tsv = "analysis/parse/OM-RGC.tsv",
         metadata = "metadata/om-rgc/Salazar_et_al_2019_Suppl_Info.xlsx",
-        abundance = "analysis/abundance/OM-RGC.tsv"
+        abundance = "analysis/abundance/OM-RGC.tsv",
+        crtZ = "analysis/hmmsearch/OM-RGC-CrtZ.txt",
+        crtZ_abundance = "analysis/hmmsearch/OM-RGC-CrtZ-abundance.tsv"
     output:
         map = "output/map_om_rgc.pdf",
-        sum = "output/sum_om_rgc.pdf"
+        sum = "output/sum_om_rgc.pdf",
+        dep1 = "output/depth_om_rgc_1.pdf",
+        lat1 = "output/latitude_om_rgc_1.pdf",
+        test1 = "output/test_om_rgc_1.txt",
+        dep2 = "output/depth_om_rgc_2.pdf",
+        lat2 = "output/latitude_om_rgc_2.pdf",
+        test2 = "output/test_om_rgc_2.txt",
+        win_wl = "output/win_wl_om_rgc.pdf"
     params:
         sheet = "Table_W1"
     conda:
-        "envs/r.yaml"
+        "envs/r_plot.yaml"
     script:
         "scripts/plot_om_rgc.R"
+
+rule om_rgc_fasta:
+    input:
+        "data/om-rgc/OM-RGC_v2.tsv"
+    output:
+        "analysis/fasta/OM-RGC.faa"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "csvtool -t TAB -u TAB namedcol OM-RGC_ID,sequence {input} | tail -n+2 | seqkit tab2fx | seqkit translate -o {output}"
 
 rule om_rgc_rhodopsins:
     input:
@@ -193,7 +232,7 @@ rule om_rgc_rhodopsins:
     shell:
         "awk -v N={params.NOG} -F\\\\t 'NR==1||$4==N' {input} > {output}"
 
-rule om_rgc_abundance:
+rule om_rgc_rhod_abundance:
     input:
         tsv = "analysis/gene_info/OM-RGC.txt",
         abundance = "data/om-rgc/OM-RGC_v2_gene_profile_metaG.tsv"
@@ -201,6 +240,15 @@ rule om_rgc_abundance:
         "analysis/abundance/OM-RGC.tsv"
     shell:
         "cut -f2 {input.tsv} | sed s/OM-RGC_ID/OMRGC_ID/ | grep -f- {input.abundance} > {output}"
+
+rule om_rgc_carot_abundance:
+    input:
+        txt = "analysis/hmmsearch/OM-RGC-{gene}.txt",
+        abundance = "data/om-rgc/OM-RGC_v2_gene_profile_metaG.tsv"
+    output:
+        "analysis/hmmsearch/OM-RGC-{gene}-abundance.tsv"
+    shell:
+        "(head -n1 {input.abundance}; cut -f1 -d' ' {input.txt} | grep -v '^#' | grep -f- {input.abundance}) > {output}"
 
 rule blasso_targets_om_rgc:
     input:
@@ -227,6 +275,19 @@ rule hmmsearch_gem:
         hmm = "analysis/refs/{profile}.hmm"
     output:
         "analysis/hmmsearch/GEM-{batch}-{profile}.txt"
+    params:
+        E = 1
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "hmmsearch -E {params.E} -o /dev/null --tblout {output} {input.hmm} {input.fasta}"
+
+rule hmmsearch_om_rgc:
+    input:
+        fasta = "analysis/fasta/OM-RGC.faa",
+        hmm = "analysis/refs/{profile}.hmm"
+    output:
+        "analysis/hmmsearch/OM-RGC-{profile}.txt"
     params:
         E = 1
     conda:
@@ -265,3 +326,81 @@ rule extract_gem_targets:
         "envs/tools.yaml"
     shell:
         "grep -v '^#' {input.txt} | cut -f1 -d' ' | sort -u | xargs seqkit faidx {input.fasta} > {output}"
+
+rule align_rhodospsins_mafft:
+    input:
+        ingroup = "input/rhodopsins.fasta",
+        outgroup = "input/outgroups.fasta",
+        ignore = "input/rhodopsins_ignore.txt"
+    output:
+        "analysis/phylogeny/rhodopsins.mafft"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf {input.ignore} | mafft --auto - > {output}"
+
+rule align_rhodospsins:
+    input:
+        ingroup = "input/rhodopsins.fasta",
+        outgroup = "input/outgroups.fasta",
+        ignore = "input/rhodopsins_ignore.txt",
+        hmm = "analysis/refs/PRXR.hmm"
+    output:
+        "analysis/phylogeny/rhodopsins.a2m"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf {input.ignore} | hmmalign --outformat A2M {input.hmm} - | reformat.pl a3m a2m - {output}"
+
+rule trim_rhodopsins_trimal:
+    input:
+        "analysis/phylogeny/rhodopsins.mafft"
+    output:
+        "analysis/phylogeny/rhodopsins.trim"
+    params:
+        gt = 0.5
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "trimal -in {input} -out {output} -gt {params.gt}"
+
+rule trim_rhodopsins:
+    input:
+        "analysis/phylogeny/rhodopsins.a2m"
+    output:
+        "analysis/phylogeny/rhodopsins.a2m.trim"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "seqkit replace -sp [a-z.] -o {output} {input}"
+
+rule iqtree_rhodopsins:
+    input:
+        "analysis/phylogeny/rhodopsins.a2m.trim"
+    output:
+        "analysis/phylogeny/rhodopsins.treefile"
+    params:
+        prefix = "analysis/phylogeny/rhodopsins",
+        seed = 123,
+        pers = 0.2,
+        nstop = 500
+    conda:
+        "envs/tools.yaml"
+    threads:
+        3
+    shell:
+        "iqtree2 -s {input} --prefix {params.prefix} -redo -seed {params.seed} -B 1000 -nt {threads} -pers {params.pers} -nstop {params.nstop}"
+
+rule plot_rhodopsins:
+    input:
+        outgroup = "input/outgroups.fasta",
+        tree = "analysis/phylogeny/rhodopsins.treefile",
+        metadata = "analysis/parse/phylogeny.tsv",
+        colors = "metadata/taxa.txt"
+    output:
+        small = "output/rhodopsins_small.svg",
+        big = "output/rhodopsins_big.svg"
+    conda:
+        "envs/r_plot.yaml"
+    script:
+        "scripts/plot_rhodopsins.R"
