@@ -9,10 +9,11 @@ crt_genes = [ "CrtZ", "CrtW", "CrtR", "BCD", "Lycopene_cycl", "TIGR02734.1" ]
 
 rule all:
     input:
-        "output/map_om_rgc.pdf",
-        "output/map_jgi.pdf", "output/sum_jgi.pdf",
-        "output/car_gem.pdf", "output/sum_gem.pdf", "output/tax_gem.pdf",
-        "output/rhodopsins_small.svg"
+        "output/om_rgc_map.pdf",
+        "output/jgi_map.pdf", "output/jgi_sum.pdf",
+        "output/gem_car.pdf", "output/gem_sum.pdf", "output/gem_tax.pdf",
+        "output/rhodopsins_small.svg",
+        "output/win_wl.pdf"
 
 module blasso:
     snakefile:
@@ -49,7 +50,7 @@ rule jgi_blasso_input:
     output:
         "blasso/targets/{batch}.fasta"
     wildcard_constraints:
-        batch = "batch\d+"
+        batch = "jgi\d+"
     shell:
         "cat {input} | tr ' ' _ > {output}"
 
@@ -59,7 +60,7 @@ rule jgi_gene_info:
     output:
         "analysis/gene_info/{batch}.txt"
     wildcard_constraints:
-        batch = "batch\d+"
+        batch = "jgi\d+"
     shell:
         "cp {input} {output}"
 
@@ -168,9 +169,9 @@ rule plot_gem:
         crt = expand("analysis/hmmsearch/GEM-{batch}-{gene}.txt", batch = gem_batches, gene = crt_genes),
         colors = "metadata/taxa.txt"
     output:
-        tax = "output/tax_gem.pdf",
-        sum = "output/sum_gem.pdf",
-        car = "output/car_gem.pdf"
+        tax = "output/gem_tax.pdf",
+        sum = "output/gem_sum.pdf",
+        car = "output/gem_car.pdf"
     conda:
         "envs/r_plot.yaml"
     script:
@@ -181,8 +182,10 @@ rule plot_jgi:
         tsv = expand("analysis/parse/{batch}.tsv", batch = jgi_batches),
         metadata = "metadata/jgi/JGI_IMG_Aquatic_Unrestricted.tsv"
     output:
-        map = "output/map_jgi.pdf",
-        sum = "output/sum_jgi.pdf"
+        map = "output/jgi_map.pdf",
+        sum = "output/jgi_sum.pdf",
+        motif_counts = "output/jgi_motif_counts.pdf",
+        motif_abundance = "output/jgi_motif_abundance.pdf"
     conda:
         "envs/r_plot.yaml"
     script:
@@ -196,21 +199,32 @@ rule plot_om_rgc:
         crtZ = "analysis/hmmsearch/OM-RGC-CrtZ.txt",
         crtZ_abundance = "analysis/hmmsearch/OM-RGC-CrtZ-abundance.tsv"
     output:
-        map = "output/map_om_rgc.pdf",
-        sum = "output/sum_om_rgc.pdf",
-        dep1 = "output/depth_om_rgc_1.pdf",
-        lat1 = "output/latitude_om_rgc_1.pdf",
-        test1 = "output/test_om_rgc_1.txt",
-        dep2 = "output/depth_om_rgc_2.pdf",
-        lat2 = "output/latitude_om_rgc_2.pdf",
-        test2 = "output/test_om_rgc_2.txt",
-        win_wl = "output/win_wl_om_rgc.pdf"
+        map = "output/om_rgc_map.pdf",
+        sum = "output/om_rgc_sum.pdf",
+        dep1 = "output/om_rgc_depth_1.pdf",
+        lat1 = "output/om_rgc_latitude_1.pdf",
+        test1 = "output/om_rgc_test_1.txt",
+        dep2 = "output/om_rgc_depth_2.pdf",
+        lat2 = "output/om_rgc_latitude_2.pdf",
+        test2 = "output/om_rgc_test_2.txt"
     params:
         sheet = "Table_W1"
     conda:
         "envs/r_plot.yaml"
     script:
         "scripts/plot_om_rgc.R"
+
+rule plot_wavelengths:
+    input:
+        jgi = expand("analysis/parse/{batch}.tsv", batch = jgi_batches),
+        om_rgc = "analysis/parse/OM-RGC.tsv",
+        gem = "analysis/parse/GEM.tsv"
+    output:
+        "output/win_wl.pdf"
+    conda:
+        "envs/r_plot.yaml"
+    script:
+        "scripts/plot_wavelengths.R"
 
 rule om_rgc_fasta:
     input:

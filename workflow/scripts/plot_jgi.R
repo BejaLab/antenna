@@ -8,6 +8,8 @@ with(snakemake@input, {
 with(snakemake@output, {
     map_file <<- map
     sum_file <<- sum
+    motif_counts_file <<- motif_counts
+    motif_abundance_file <<- motif_abundance
 })
 
 metadata <- read.table(metadata_file, header = T, sep = "\t", quote = "", comment.char = "", na.strings = c("", "n/a")) %>%
@@ -15,8 +17,9 @@ metadata <- read.table(metadata_file, header = T, sep = "\t", quote = "", commen
     my_ecosystem %>%
     mutate(x = round(Longitude), y = round(Latitude))
 all.data <- lapply(tsv_files, read.table, header = T, sep = "\t", quote = "", comment.char = "") %>%
-    lapply(select, "record_id", "checksum", "positions", "family", "wl_mean", "wl_sd", "Locus.Tag", "Genome.ID", "NCBI.Biosample.Accession", "Scaffold.Read.Depth") %>%
+    lapply(select, "record_id", "checksum", "motif", "window", "blasso", "family", "wl_mean", "wl_sd", "Locus.Tag", "Genome.ID", "NCBI.Biosample.Accession", "Scaffold.Read.Depth") %>%
     bind_rows %>%
+    filter(!grepl("-", motif)) %>%
     distinct(record_id, .keep_all = T) %>%
     group_by(Genome.ID) %>%
     arrange(-n()) %>%
@@ -25,10 +28,11 @@ all.data <- lapply(tsv_files, read.table, header = T, sep = "\t", quote = "", co
     my_rhodopsin_class %>%
     left_join(metadata, by = c(Genome.ID = "taxon_oid")) %>%
     mutate(Abundance = Scaffold.Read.Depth) %>%
-    filter(!is.na(x))
-data <- group_by(all.data, x, y) %>%
+    filter(!is.na(x)) %>%
+    group_by(x, y) %>%
     filter(n_distinct(Ecosystem) == 1) %>%
-    filter(sum(class %in% c("x", "p")) > 9) %>%
+    filter(sum(class %in% c("x", "p")) > 9)
+data <- filter(all.data, class %in% c("x", "p")) %>%
     ungroup %>%
     complete(class, window, nesting(x, y, Ecosystem), fill = list(Abundance = 0)) %>%
     group_by(x, y, Ecosystem) %>%
@@ -39,20 +43,35 @@ motifs_counts <- all.data %>%
     distinct(checksum, .keep_all = T) %>%
     group_by(family, motif, Ecosystem) %>%
     summarize(Abundance = n())
+motifs_high <- all.data %>%
+    group_by(motif) %>%
+    summarize(Abundance = sum(Abundance)) %>%
+    arrange(-Abundance) %>%
+    head(n = 12) %>%
+    pull(motif)
 motifs_weighted <- all.data %>%
     group_by(family, motif, Ecosystem) %>%
-    summarize(Abundance = sum(Abundance))
+    summarize(Abundance = sum(Abundance), .groups = "drop") %>%
+    mutate(motif_top = factor(motif, levels = motifs_high)) %>%
+    group_by(Ecosystem) %>%
+    mutate(pct = Abundance / sum(Abundance) * 100) %>%
+    group_by(family) %>%
+    mutate(Family_abundance = sum(Abundance)) %>%
+    ungroup %>%
+    filter(Family_abundance / sum(Abundance) > 0.001) %>%
+    arrange(-Family_abundance) %>%
+    mutate(family = factor(family, levels = unique(family)))
 
 p <- ggplot(motifs_counts, aes(fill = motif, x = family, y = Abundance)) +
     geom_bar(position = "stack", stat = "identity") +
-    facet_wrap(. ~ Ecosystem)
-ggsave("tmp1-jgi.pdf", p, width = 14)
-p <- ggplot(motifs_weighted, aes(fill = motif, x = family, y = Abundance)) +
+    facet_wrap(. ~ Ecosystem, scales = "free_y")
+ggsave(motif_counts_file, p, width = 14)
+p <- ggplot(motifs_weighted, aes(fill = motif_top, x = family, y = pct)) +
     geom_bar(position = "stack", stat = "identity") +
-    facet_wrap(. ~ Ecosystem)
-ggsave("tmp2-jgi.pdf", p, width = 14)
-
-
+    facet_wrap(. ~ Ecosystem) +
+    scale_fill_brewer(palette = "Set3", na.value = "grey50") +
+    theme_bw()
+ggsave(motif_abundance_file, p, width = 5.6595, height = 3.1395)
 
 #by_location <- group_by(data, x, y, Ecosystem) %>%
 #    group_split %>%

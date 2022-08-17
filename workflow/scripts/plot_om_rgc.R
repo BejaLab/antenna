@@ -23,7 +23,6 @@ with(snakemake@output, {
     dep2_file <<- dep2
     lat2_file <<- lat2
     test2_file <<- test2
-    win_wl_file <<- win_wl
 })
 
 metadata <- read_excel(metadata_file, sheet_name, .name_repair = "universal") %>%
@@ -46,12 +45,11 @@ motifs_weighted <- all.data %>%
     group_by(family, motif) %>%
     summarize(Abundance = sum(Abundance))
 
-p <- ggplot(motifs_counts, aes(fill = motif, x = family, y = Abundance)) +
-    geom_bar(position = "stack", stat = "identity")
-ggsave("tmp1-om-rgc.pdf", p)
-p <- ggplot(motifs_weighted, aes(fill = motif, x = family, y = Abundance)) +
-    geom_bar(position = "stack", stat = "identity")
-ggsave("tmp2-om-rgc.pdf", p)
+# NB: thses plots are not saved
+#p <- ggplot(motifs_counts, aes(fill = motif, x = family, y = Abundance)) +
+#    geom_bar(position = "stack", stat = "identity")
+#p <- ggplot(motifs_weighted, aes(fill = motif, x = family, y = Abundance)) +
+#    geom_bar(position = "stack", stat = "identity")
 
 ratio.data <- filter(all.data, class %in% c("x", "p"), !is.na(fenestrated), !is.na(Depth)) %>%
     # filter(Polar == "Non polar") %>%
@@ -135,9 +133,9 @@ p <- ggplot(crtZ.data, aes(x = Depth, y = ratio, size = Abundance)) +
     scale_y_continuous(trans = 'log10')
 ggsave("tmp.pdf", p)
 
-prots <- distinct(all.data, record_id, .keep_all=T)
-p <- ggplot(prots, aes(x = window, y = wl_mean)) + geom_boxplot()
-ggsave(win_wl_file, p)
+# prots <- distinct(all.data, record_id, .keep_all=T)
+# p <- ggplot(prots, aes(x = window, y = wl_mean)) + geom_boxplot()
+# ggsave(win_wl_file, p)
 
 data <- group_by(all.data, x, y, Ecosystem, class, window) %>%
     summarize(Abundance = sum(Abundance), .groups = "drop") %>%

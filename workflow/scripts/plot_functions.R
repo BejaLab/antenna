@@ -59,7 +59,6 @@ my_ecosystem <- function(.data) {
 
 my_rhodopsin_class <- function(.data) {
     .data %>%
-        mutate(motif = substr(positions, 1, 3), window = substr(positions, 4, 4)) %>%
         mutate(class = case_when(
             family == "XR" & motif == "DTE" ~ "x",
             family == "PR" & motif == "DTE" ~ "p",

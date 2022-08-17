@@ -35,15 +35,15 @@ with open(info_file) as fh:
     if has_sequence:
         header.remove('sequence')
 
-positions = dict()
+positions = []
+groups = []
 with open(pos_file) as fh:
     for line in fh:
-        pos, *expected = line.rstrip().split()
+        pos, group = line.rstrip().split()
         pos0 = int(pos) - 1
-        if expected:
-            positions[pos0] = expected[0]
-        else:
-            positions[pos0] = ''
+        positions.append((pos0, group))
+        if len(group) > 1 and group not in groups:
+            groups.append(group)
 
 blassos = dict()
 with open(blasso_file) as fh:
@@ -65,17 +65,17 @@ with open(usearch_file) as fh:
 aminoacids = [ 'A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y' ]
 with open(out_file, 'w') as out_fh:
     tsv = csv.writer(out_fh, delimiter = "\t")
-    tsv.writerow([ 'record_id', 'positions', 'checksum', 'target', 'family', 'ident', 'wl_mean', 'wl_sd' ] + header)
+    tsv.writerow([ 'record_id', 'checksum', 'target', 'family', 'ident', 'wl_mean', 'wl_sd' ] + groups + header)
     with open(a2m_file) as a2m_fh:
         a2m = SeqIO.parse(a2m_fh, 'fasta')
         ref = next(a2m)
         ref_pos = 0
-        aln_pos = dict()
+        aln_pos = []
         for pos in range(len(ref.seq)):
             if ref.seq[pos] not in [ '-', '.' ]:
-                if ref_pos in positions:
-                    assert ref.seq[pos] in aminoacids, "Reference position %d is not aligned" % (ref_pos + 1)
-                    aln_pos[pos] = positions[ref_pos]
+                for pos0, group in positions:
+                    if ref_pos == pos0:
+                        aln_pos.append((pos, group))
                 ref_pos += 1
         for rec in a2m:
             if rec.id in matches:
@@ -85,15 +85,14 @@ with open(out_file, 'w') as out_fh:
                 blasso = blassos[rec.id]
                 info_id, *rest = rec.id.split('/')
                 info   = infos[info_id]
-                res = []
-                for pos, expected in aln_pos.items():
-                    if rec.seq[pos] not in aminoacids:
-                        break
-                    elif not expected:
-                        res.append(rec.seq[pos])
-                    elif rec.seq[pos] != expected:
+                res = { group: [] for group in groups }
+                for pos, group in aln_pos:
+                    if group in groups:
+                        res[group].append(rec.seq[pos])
+                    elif rec.seq[pos] != group:
                         break
                 else:
-                    row = [ rec.id, ''.join(res), cks, match['target'], match['family'], match['ident'], blasso['wl_mean'], blasso['wl_sd'] ]
+                    row = [ rec.id, cks, match['target'], match['family'], match['ident'], blasso['wl_mean'], blasso['wl_sd'] ]
+                    row += [ ''.join(res[x]) for x in groups ]
                     row += info.values()
                     tsv.writerow(row)

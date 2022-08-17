@@ -34,13 +34,13 @@ genes <- lapply(crt_files, read.table) %>%
 
 all_data <- read.table(tsv_file, header = T, sep = "\t", quote = "", comment.char = "") %>%
     rename(Taxonomy = "ecosystem") %>% # fix bug
-    filter(ecosystem_category == "Aquatic") %>%
+    filter(ecosystem_category == "Aquatic", !grepl("-", motif)) %>%
     mutate(Ecosystem.Type = ecosystem_type, Specific.Ecosystem = habitat, Ecosystem.Subtype = habitat, Isolation = habitat, x = longitude, y = latitude, Abundance = 1) %>%
     my_ecosystem %>% 
     my_rhodopsin_class %>%
     separate(record_id, into = c("Genome.ID", "Gene.ID"), sep = "/") %>%
     mutate(window_type = case_when(
-        window %in% c("W", "F") ~ "WF",
+        window %in% c("W", "F") ~ "FW",
         window %in% c("G") ~ "G",
         T ~ "other"
     )) %>%
@@ -59,7 +59,7 @@ by_ecosystem <- group_by(data, class, window, Ecosystem) %>%
 aliases <- list(Cyanobacteriota = "Cyanobacteria")
 by_taxa <- distinct(all_data, otu_id, .keep_all = T) %>%
     separate_rows(Taxonomy, sep = ";") %>%
-    filter(class %in% c("x", "p"), window_type %in% c("WF", "G")) %>%
+    filter(class %in% c("x", "p"), window_type %in% c("FW", "G")) %>%
     separate(Taxonomy, into = c("Rank", "Name"), sep = "__") %>%
     filter(Rank == "p") %>%
     group_by(class, window_type, Ecosystem, Name) %>%
@@ -95,7 +95,7 @@ p <- ggplot(by_taxa, aes(fill = Name, x = Ecosystem, y = Abundance)) +
     scale_fill_manual(values = taxa) +
     facet_grid(class ~ window_type) +
     theme_bw()
-ggsave(tax_file, p)
+ggsave(tax_file, p, width = 6.5, height = 3.4695)
 
 p <- my_ggplot_ecosystems()
 p <- Reduce(my_add_grob_to_ecosystem, by_ecosystem, p)
