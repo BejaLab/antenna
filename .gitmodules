@@ -1,0 +1,3 @@
+[submodule "workflow/BLASSO-Rhodopsin"]
+	path = workflow/BLASSO-Rhodopsin
+	url = https://github.com/BejaLab/BLASSO-Rhodopsin
