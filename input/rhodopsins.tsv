@@ -1,0 +1,120 @@
+ID	Alias	Activity	Superclade	Clade	Subclade	Clade name	Subclade name	Sources	Organism.Orig	Organism	Taxon	Subtaxon	Highlight
+B1YFV8	ESR	proton pump	P	ESR		Exiguobacterium sibiricum rhodopsin		doi:10.1016/j.febslet.2010.09.005	Exiguobacterium sibiricum	Exiguobacterium sibiricum	Firmicutes		
+A0A0U2XMT3	MACR	proton pump	P	MACR		Marine actinobacterial clade rhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL26B11	EIL26B11	Actinobacteriota		
+A0A345UIE9		[sodium] pump	P	NQ		NQ rhodopsin pumps		doi:10.3389/fmicb.2018.02672	Cyclonatronum proteinivorum Omega	Cyclonatronum proteinivorum	Balneolaeota		
+N0DKS8	KR2	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1038/ncomms2689, doi:10.1016/j.bpj.2015.08.018	Dokdonia eikasta NBRC100814	Dokdonia eikasta	Bacteroidota		
+H2E7S1	DsNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1134/S0006297915040082	Dokdonia sp. PRO95	Dokdonia sp. PRO95	Bacteroidota		
+A0A0P0Z9C2	FR	chloride pump	P	NQ		NQ rhodopsin pumps		doi:10.1021/jp507219q	Fulvimarina pelagi	Fulvimarina pelagi	Proteobacteria	Alphaproteobacteria	
+W8VZ79	NM-R2, NMR2, NmNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1073/pnas.1403051111, doi:10.1016/j.bpj.2015.08.018	Nonlabens marinus S1-08	Nonlabens marinus	Bacteroidota		
+W8VZW3	NM-R3, NmClR	chloride pump	P	NQ		NQ rhodopsin pumps		doi:10.1073/pnas.1403051111	Nonlabens marinus S1-08	Nonlabens marinus	Bacteroidota		
+WP_051881608.1	PoClR	chloride pump	P	NQ		NQ rhodopsin pumps		doi:10.1038/ncomms13415	Parvularcula oceani	Parvularcula oceani	Proteobacteria	Alphaproteobacteria	
+N0DLS5	KR1	proton pump	P	PR		Proteorhodopsins		doi:10.1038/ncomms2689	Dokdonia eikasta NBRC100814	Dokdonia eikasta	Bacteroidota		
+Q9F7P4	GPR	proton pump	P	PR		Proteorhodopsins		doi:10.1126/science.289.5486.1902	Gammaproteobacterium EBAC31A08	EBAC31A08	Proteobacteria	Gammaproteobacteria	Y
+Q9AFF7	BPR	proton pump	P	PR		Proteorhodopsins		doi:10.1074/jbc.M305716200	Gammaproteobacterium Hot75m4	Hot75m4	Proteobacteria	Gammaproteobacteria	
+L7W6K7	NdR1	proton pump	P	PR		Proteorhodopsins		doi:10.1002/mbo3.321	Nonlabens dokdonensis DSW-6	Nonlabens dokdonensis	Bacteroidota		
+W8VZ92	NM-R1, NmPR	proton pump	P	PR		Proteorhodopsins		doi:10.1073/pnas.1403051111	Nonlabens marinus S1-08	Nonlabens marinus	Bacteroidota		
+Q4FMZ3		proton pump	P	PR		Proteorhodopsins		doi:10.1038/nature04032	Pelagibacter ubique str. HTCC1062	Pelagibacter ubique	Proteobacteria	Alphaproteobacteria	
+A0A075VNE6		proton pump	P	PR		Proteorhodopsins		doi:10.1002/mbo3.808, doi:10.1002/mbo3.321	Sediminicola sp. YIK13	Sediminicola sp. YIK13	Bacteroidota		
+H9ZSC3	TR	proton pump	P	XR		Xanthorhodopsins		doi:10.1074/jbc.M113.479394, doi:10.1021/acs.jpcb.8b06795	Thermus thermophilus JL-18	Thermus thermophilus	Deinococcota		
+A0A0U2XMF7		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL102C09	EIL102C09	Proteobacteria	Alphaproteobacteria	
+A0A0U2XPJ1		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL107F05	EIL107F05	Proteobacteria	Gammaproteobacteria	
+A0A0U2XUA6		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL11C05	EIL11C05	Proteobacteria	Gammaproteobacteria	
+A0A0U2VY15		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL20A02	EIL20A02	Proteobacteria	Alphaproteobacteria	
+A0A0U2XPK0		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL27G07	EIL27G07	Proteobacteria	Gammaproteobacteria	
+A0A0U2W912		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL4H10	EIL4H10	Proteobacteria	Alphaproteobacteria	
+A0A0U2XPP9		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL5A08	EIL5A08	Proteobacteria	Gammaproteobacteria	
+A0A0U2W866		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL68H05	EIL68H05	Proteobacteria	Gammaproteobacteria	
+A0A0U2XBX5		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL80B09	EIL80B09	Proteobacteria		
+A0A0U2VXF3		proton pump	P	PR		Proteorhodopsins		doi:10.1038/ismej.2016.7	uncultured bacterium EIL80E09	EIL80E09	Proteobacteria		
+Q4PJ82		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine alphaproteobacterium MED18B02	MED18B02	Proteobacteria	Alphaproteobacteria	
+Q4PJD2		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine alphaproteobacterium MED46A06	MED46A06	Proteobacteria	Alphaproteobacteria	
+Q4PNF2		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine alphaproteobacterium MED66A3	MED66A3	Proteobacteria	Alphaproteobacteria	
+A4GIH8		proton pump	P	PR		Proteorhodopsins		doi:10.1073/pnas.0611470104	uncultured marine bacterium HF10_19P19	HF10_19P19	Proteobacteria	Alphaproteobacteria	
+A4GIJ7		proton pump	P	PR		Proteorhodopsins		doi:10.1073/pnas.0611470104	uncultured marine bacterium HF10_25F10	HF10_25F10	Proteobacteria	Alphaproteobacteria	
+Q4JMW8		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine bacterium MED13K09	MED13K09	Proteobacteria		
+Q4PKF4		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine bacterium MED82F10	MED82F10	Proteobacteria	Alphaproteobacteria	
+Q4PK46		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.0030273	uncultured marine gammaproteobacterium MED49C08	MED49C08	Proteobacteria	Gammaproteobacteria	
+Q2QAQ5		proton pump	P	PR		Proteorhodopsins		doi:10.1038/nature04435	uncultured marine group II euryarchaeote HF70_59C08	HF70_59C08	Thermoplasmatota		
+E0WCL9		proton pump	P	PR		Proteorhodopsins		doi:10.1371/journal.pone.0038749	Vibrio campbellii	Vibrio campbellii	Proteobacteria	Gammaproteobacteria	
+A0A1Y0MHV8		proton pump	P	PR		Proteorhodopsins		doi:10.1111/j.1462-2920.2012.02702.x	Winogradskyella sp. PC-19	Winogradskyella sp. PC-19	Bacteroidota		
+A0A024FL76		proton pump	P	PR		Proteorhodopsins		doi:10.1111/j.1462-2920.2012.02702.x	Winogradskyella sp. PG-2	Winogradskyella sp. PG-2	Bacteroidota		
+J9H7H8		proton pump	P	XR	ActR	Xanthorhodopsins	Actinorhodopsins	doi:10.1128/AEM.01678-18	actinobacterium SCGC AAA027-L06	SCGC AAA027-L06	Actinobacteriota		
+A0A1D9E0H1	RpActR	proton pump	P	XR	ActR	Xanthorhodopsins	Actinorhodopsins	doi:10.1016/j.bbabio.2016.09.006	Candidatus Rhodoluna planktonica	Ca. Rhodoluna planktonica	Actinobacteriota		
+C0K2L3		proton pump	P	XR	ActR	Xanthorhodopsins	Actinorhodopsins	doi:10.1128/JB.00386-15	Rhodoluna lacicola	Ca. Rhodoluna lacicola	Actinobacteriota		
+A7WQE1	OR1, OmR1	proton pump	P	XR	Eukaryotic_XR	Xanthorhodopsins	Eukaryotic xanthorhodopsins	doi:10.1021/bi301412n	Oxyrrhis marina	Oxyrrhis marina	Eukaryota		
+Q7NP59	GR	proton pump	P	XR		Xanthorhodopsins		doi:10.1371/journal.pone.0110643, doi:10.1021/bi901552x, doi:10.1021/bi1014166	Gloeobacter violaceus str. ATCC 29082 / PCC 7421	Gloeobacter violaceus	Cyanobacteria		
+M9RHM7		proton pump	P	XR		Xanthorhodopsins		doi:10.1371/journal.pone.0063422	Octadecabacter antarcticus 307	Octadecabacter antarcticus	Proteobacteria	Alphaproteobacteria	
+M9RSC0		proton pump	P	XR		Xanthorhodopsins		doi:10.1371/journal.pone.0063422	Octadecabacter arcticus 238	Octadecabacter arcticus	Proteobacteria	Alphaproteobacteria	
+F1VXN1		proton pump	P	XR		Xanthorhodopsins		doi:10.5857/RCP.2013.2.2.60	Oxalobacteraceae bacterium IMCC9480	Oxalobacteraceae bacterium	Proteobacteria	Betaproteobacteria	
+Q2S2F8	XR	proton pump	P	XR		Xanthorhodopsins		doi:10.1126/science.1118046, doi:10.1126/science.1118046, doi:10.1111/j.1751-1097.2008.00337.x, doi:10.1021/jp910845h, doi:10.1016/j.bpj.2009.01.004	Salinibacter ruber str. DSM 13855 / M31	Salinibacter ruber	Bacteroidota		
+A0A173LX52	AmXLR	proton pump	P	XR	ActR	Xanthorhodopsins	Actinorhodopsins	doi:10.1264/jsme2.ME20085	Aurantimicrobium minutum KNC	Aurantimicrobium minutum	Actinobacteriota		
+UJI09384.1	EINA29G6	proton pump	P	PR		Proteorhodopsins		doi:10.1111/1462-2920.15890			Bacteroidota		T
+WP_040324815.1	ActR-13023	proton pump	P	XR	ActR	Xanthorhodopsins	Actinorhodopsins	doi:10.3389/fmicb.2021.652328	Candidatus Aquiluna sp. IMCC13023	Ca. Aquiluna sp. IMCC13023	Actinobacteriota		
+H2BW50	GlNaR, GLR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1021/bi501064n, doi:10.1016/j.bpj.2015.08.018, doi:10.1017/9781107281875.008	Gillisia limnaea DSM 15749	Gillisia limnaea	Bacteroidota		
+S2D3K4	IaNaR, IAR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1016/j.bpj.2015.08.018, doi:10.1039/D0CP05652A	Indibacter alkaliphilus LW1	Indibacter alkaliphilus	Bacteroidota		
+L7W3L9	NdR2, DDR2	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1016/j.jphotobiol.2017.05.004, doi:10.1016/j.bpj.2015.08.018	Nonlabens dokdonensis DSW-6	Nonlabens dokdonensis	Bacteroidota		
+D7CW88	TrNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.2142/biophys.54.S182_1	Truepera radiovictrix DSM 17093	Truepera radiovictrix	Deinococcota		
+WP_018784639.1		[sodium] pump	P	NQ		NQ rhodopsin pumps		doi:10.1371/journal.pone.0179232	Micromonospora sp. CNB394	Micromonospora sp. CNB394	Actinobacteriota		
+AHN13815.2	NyNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1371/journal.pone.0179232	Nonlabens sp. YIK-SED-11	Nonlabens sp. YIK-SED-11	Bacteroidota		
+WP_052341415.1	SrNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1371/journal.pone.0179232	Salinarimonas rosea DSM21201	Salinarimonas rosea	Proteobacteria	Alphaproteobacteria	
+A0A0M7BDG0	JsNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1038/s41467-019-10000	Jannaschia seosinensis	Jannaschia seosinensis	Proteobacteria	Alphaproteobacteria	
+F6K461	PGr1	proton pump	P	XR		Xanthorhodopsins		http://publications.rwth-aachen.de/record/726092/files/726092.pdf	Polarella glacialis	Polarella glacialis	Eukaryota		
+AHN13816.1	FdNaR	sodium pump	P	NQ		NQ rhodopsin pumps		doi:10.1038/s41467-019-10000	Nonlabens sp. MIC269	Nonlabens sp. MIC269	Bacteroidota		
+ECV93033.1		proton pump	P	PR		Proteorhodopsins		doi:10.1038/s42003-021-01878-9	marine metagenome		Bacteroidota		
+A4GI53	ABL4	proton pump	P	PR		Proteorhodopsins		doi:10.1111/php.13114	uncultured marine bacterium EB0_41B09	EB0_41B09	Proteobacteria		
+Tara76	Tara76	proton pump	P	PR		Proteorhodopsins		doi:10.1016/j.isci.2021.102620	uncultured marine bacterium		Proteobacteria	Gammaproteobacteria	
+A0A0A7RP02	PngR	proton pump	P	XR	Eukaryotic_XR	Xanthorhodopsins	Eukaryotic xanthorhodopsins	doi:10.1101/2022.01.18.476826	Pseudo-nitzschia granii	Pseudo-nitzschia granii	Eukaryota		
+HOT226_1_0075m_c26173_1		proton pump	P	XR				doi:10.1038/s41396-018-0074-4			SAR324		
+HOT232_1_0075m_c14917_1		proton pump	P	PR				doi:10.1038/s41396-018-0074-4			Bacteroidota		
+HOT231_1_0075m_rep_c118764_1		proton pump	P	PR				doi:10.1038/s41396-018-0074-4			Proteobacteria	Alphaproteobacteria	
+HOT229_2_0770m_rep_c426637_1		proton pump	P	PR				doi:10.1038/s41396-018-0074-4			Proteobacteria	Alphaproteobacteria	
+WP_052001698.1	LaNaR		P	NQ		NQ rhodopsin pumps		doi:10.1371/journal.pone.0179232	Lyngbya aestuarii BL J	Lyngbya aestuarii	Cyanobacteria		
+I0IBH0	PMr1		P	NQ		NQ rhodopsin pumps		http://publications.rwth-aachen.de/record/726092/files/726092.pdf	Phycisphaera mikurensis	Phycisphaera mikurensis	Planctomycetota		
+I0IGJ9	PMr2		P	NQ		NQ rhodopsin pumps		http://publications.rwth-aachen.de/record/726092/files/726092.pdf	Phycisphaera mikurensis	Phycisphaera mikurensis	Planctomycetota		
+ABL97763.1	ABL3		P	XR		Xanthorhodopsins		doi:10.1111/php.13114	uncultured marine bacterium EB0_41B09	EB0_41B09	Proteobacteria	Alphaproteobacteria	
+HOT224_1_0075m_rep_c23018_6	HOT224_1_0075m_rep_c23018_6		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT224_1_0500m_rep_c31626_17	HOT224_1_0500m_rep_c31626_17		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_1_0500m_rep_c269342_2	HOT237_1_0500m_rep_c269342_2		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT224_1_0770m_rep_c62881_1	HOT224_1_0770m_rep_c62881_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT229_2_0770m_rep_c187797_7	HOT229_2_0770m_rep_c187797_7		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_2_0770m_rep_c146088_1	HOT237_2_0770m_rep_c146088_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_0500m_rep_c626897_2	HOT237_0500m_rep_c626897_2		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT232_3_0500m_rep_c461366_1	HOT232_3_0500m_rep_c461366_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT232_1_0200m_rep_c741013_3	HOT232_1_0200m_rep_c741013_3		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT229_1_0500m_rep_c217016_1	HOT229_1_0500m_rep_c217016_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_2_0500m_rep_c308952_1	HOT237_2_0500m_rep_c308952_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_0500m_rep_c372865_3	HOT237_0500m_rep_c372865_3		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT229_2_0770m_rep_c196804_1	HOT229_2_0770m_rep_c196804_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT229_1_0200m_rep_c816919_1	HOT229_1_0200m_rep_c816919_1		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT229_2_0770m_rep_c426152_2	HOT229_2_0770m_rep_c426152_2		P	PR				doi:10.1038/s41396-018-0074-4					
+HOT237_0500m_rep_c1014546_3	HOT237_0500m_rep_c1014546_3		P	PR				doi:10.1038/s41396-018-0074-4					
+A8T1H9	VsPR	[proton pump]	P	PR		Proteorhodopsins		doi:10.1371/journal.pbio.1000358	Vibrio sp. AND4	Vibrio sp. AND4	Proteobacteria	Gammaproteobacteria	
+Q99QJ3		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium PalE6	PalE6	Proteobacteria	Gammaproteobacteria	
+Q84BD7		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium REDr6a5a6	REDr6a5a6	Proteobacteria	Gammaproteobacteria	
+Q84BE2		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium RS23	RS23	Proteobacteria	Gammaproteobacteria	
+Q9AFG0		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium eBac40E8	eBac40E8	Proteobacteria	Gammaproteobacteria	
+Q9AFF9		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium eBac64A5	eBac64A5	Proteobacteria	Gammaproteobacteria	
+Q99QB3		[proton pump]	P	PR		Proteorhodopsins		doi:10.1093/emboj/cdg183	Gammaproteobacterium HOT0m1	HOT0m1	Proteobacteria	Gammaproteobacteria	
+D0RNG4	TAT		P	TAT				doi:10.1021/acs.jpclett.9b01957	alpha proteobacterium HIMB114	HIMB114	Proteobacteria	Alphaproteobacteria	
+A0A142HG79	LR1, HsETQ		P	PR				doi:10.1007/s10863-018-9775-7	Hymenobacter sp. PAMC 26554	Hymenobacter sp. PAMC 26554	Bacteroidota		
+S2D2R9	IaR1	[proton pump]	P	PR				http://www-als.ics.nitech.ac.jp/~karasuyama/BLASSO-for-Rhodopsins/	Indibacter alkaliphilus LW1	Indibacter alkaliphilus	Bacteroidota		
+WP_051881578.1	PoNaR	[sodium pump]	P	NQ				doi:10.1038/s41467-019-10000-x	Parvularcula oceani	Parvularcula oceani	Proteobacteria	Alphaproteobacteria	
+Ga0011477_2517765527	QsActR	proton pump	P	P1				Inoue et al unpubl	Quadrisphaera sp. R2A-380-A	Quadrisphaera sp. R2A-380-A	Actinobacteriota		
+WP_011981580.1	KrActR	proton pump	P	P1				Inoue et al unpubl	Kineococcus radiotolerans	Kineococcus radiotolerans	Actinobacteriota		
+PgXR1	PgXR1	[proton pump]	P	XR		Xanthorhodopsins			Phaeocystis globosa	Phaeocystis globosa	Eukaryota		
+PgXR2	PgXR2	[proton pump]	P	XR		Xanthorhodopsins			Phaeocystis globosa	Phaeocystis globosa	Eukaryota		
+SAMEA2621536_1986778_5.1	SAMEA5.1		P	XR		Xanthorhodopsins					Proteobacteria	Gammaproteobacteria	
+SAMEA2621536_1986778_5.2	SAMEA5.2	[proton pump]	P	PR		Proteorhodopsins					Proteobacteria	Gammaproteobacteria	
+QXD31193.1		[proton pump]	P	PR		Proteorhodopsins			Opitutae bacterium ISCC 53	Opitutae bacterium ISCC 53	Verrucomicrobiota		
+A0A2E9CEV6	HeimdallR	proton pump	P	HeimdallR		Heimdallarchaeia rhodopsin		doi:10.1126/sciadv.aaz2441	Heimdallarchaeota archaeon isolate RS678 59522	RS678_59522	Asgardarchaea		
+Kin4B8-XR	Kin4B8	proton pump	P	XR		Xanthorhodopsins		Chazan et al			Bdellovibrionota		T
+WP_105002929.1	TsPR	proton pump	P	PR		Proteorhodopsins		Yoshizawa et al unpubl	Tenacibaculum sp. SG-28	Tenacibaculum sp. SG-28	Bacteroidota		T
+ABA61407.1			P	PR		Proteorhodopsins			uncultured marine group II euryarchaeote HF70_39H11	HF70_39H11	Thermoplasmatota		
+ABB82977.1			P	PR		Proteorhodopsins			uncultured organism HF70_19B12	HF70_19B12	Thermoplasmatota		
+ABB82983.1			P	PR		Proteorhodopsins			uncultured organism HF10_3D09	HF10_3D09	Thermoplasmatota		
+KIE48989.1			P	XR	AcidiR	Xanthorhodopsins	Acidirhodopsins		marine actinobacterium MedAcidi-G1	MedAcidi-G1	Actinobacteriota	Acidimicrobiia	
+KGA12121.1			P	XR	AcidiR	Xanthorhodopsins	Acidirhodopsins		actinobacterium acAcidi	acAcidi	Actinobacteriota	Acidimicrobiia	
+ACN42852.1			P	XR	AcidiR	Xanthorhodopsins	Acidirhodopsins		Actinobacterium MWH-EgelM2-3.D6	MWH-EgelM2-3.D6	Actinobacteriota	Acidimicrobiia	
+EHR75770.1			P	ACB					uncultured Candidatus Poseidoniales archaeon		Thermoplasmatota		
+ADD93192.1			P	ACB					uncultured archaeon MedDCM-OCT-S08-C16	MedDCM-OCT-S08-C16	Thermoplasmatota		
+A0A4P6X9T5			P	XR		Xanthorhodopsins		Koblizek et al	Sphingomonas sp. AAP5	Sphingomonas sp. AAP5	Proteobacteria	Alphaproteobacteria	
