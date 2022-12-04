@@ -118,7 +118,7 @@ my_ggplot_world <- function() {
     ggplot(world) +
         geom_map(data = world, map = world, aes(long, lat, map_id = region), color = "black", fill = "lightgray", size = 0.1) +
         coord_equal() +
-        xlim(c(-180, 180))
+        xlim(c(-185, 185))
 }
 
 get_repel_coords <- function(.data, map_g, width, height) {
@@ -150,8 +150,7 @@ get_repel_coords <- function(.data, map_g, width, height) {
         mutate(theta = atan2(y - y.repel, x - x.repel), x.segm = x.repel + Total * cos(theta), y.segm = y.repel + Total * sin(theta))
 }
 
-my_pies <- function(.data, width, height, repel = T) {
-    .data <- by_location
+my_pies <- function(.data, width, height, labeller = identity, repel = T) {
     g <- my_ggplot_world()
     if (repel) {
         .data <- get_repel_coords(.data, g, width, height)
@@ -163,7 +162,7 @@ my_pies <- function(.data, width, height, repel = T) {
         geom_segment(aes(x = x.segm, y = y.segm, xend = x, yend = y, color = Ecosystem), data = .data, arrow = arrow(length = unit(0.01, "npc"))) +
         geom_scatterpie(aes(x = x.repel, y = y.repel, r = Total), data = .data, color = NA, cols = c("G", "WF")) +
         geom_circle(aes(x0 = x.repel, y0 = y.repel, r = Total, color = Ecosystem), data = .data) +
-        geom_scatterpie_legend(.data$Total, x = -140, y = -70) +
+        geom_scatterpie_legend(.data$Total, x = -140, y = -70, labeller = labeller) +
 	scale_fill_manual(values = win.cols) +
         scale_color_manual(values = all_ecosystems) +
         theme_bw() +

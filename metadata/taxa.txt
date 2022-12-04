@@ -13,3 +13,5 @@ SAR324	#c768bd
 Thermoplasmatota	#1f78b4
 Verrucomicrobiota	#6a3d9a
 Chloroflexota	#33a02c
+Myxococcota	grey40
+Acidobacteriota	grey30

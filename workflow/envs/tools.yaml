@@ -1,6 +1,6 @@
 channels:
- - bioconda
  - conda-forge
+ - bioconda
 dependencies:
  - hmmer=3.3.2
  - mafft=7.505
@@ -8,3 +8,4 @@ dependencies:
  - seqkit=2.2.0
  - trimal=1.4.1
  - iqtree=2.2.0.3
+ - csvkit=1.0.7

@@ -9,6 +9,7 @@ library(ggplot2)
 library(phangorn)
 library(ggnewscale)
 library(castor)
+library(seqinr)
 
 if (interactive()) {
     Snakemake <- setClass("Snakemake", slots = list(input = "list", output = "list"))
@@ -21,12 +22,14 @@ if (interactive()) {
 with(snakemake@input, {
     outgroup_file <<- outgroup
     tree_file     <<- tree
-    metadata_file <<- metadata
+    tsv_file      <<- tsv
     colors_file   <<- colors
+    a2m_file      <<- a2m
 })
 with(snakemake@output, {
     output_file_small <<- small
     output_file_big   <<- big
+    output_jtree      <<- jtree
 })
 
 taxa <- read.table("metadata/taxa.txt", sep = "\t", comment.char = "") %>%
@@ -34,19 +37,31 @@ taxa <- read.table("metadata/taxa.txt", sep = "\t", comment.char = "") %>%
     with(setNames(V2, V1))
 
 outgroups <- names(read.fasta(outgroup_file))
-metadata <- read.table(metadata_file, header = T, sep = "\t", na.strings = "", fill = T) %>%
-    rename(label = record_id) %>%
+tsv <- read.table(tsv_file, header = T, sep = "\t", na.strings = "", fill = T) %>%
+    select(-target)
+metadata <- read.fasta(a2m_file, seqtype = "AA", as.string = T) %>%
+    {data.frame(label = names(.), sequence = as.character(.))} %>%
+    left_join(tsv, by = c(label = "record_id")) %>%
+    mutate(is_outgroup = label %in% outgroups) %>%
     mutate(Alias = gsub(",.+", "", Alias)) %>%
     mutate(Activity = ifelse(grepl("\\]$", Activity), NA, gsub("[][]", "", Activity))) %>%
     mutate(Highlight = !is.na(Highlight)) %>%
     mutate(D85 = substr(motif, 1, 1), T89 = substr(motif, 2, 2), D96 = substr(motif, 3, 3), G156 = window)
 
-tree.tib <- read.tree(tree_file) %>%
-    ape::root(outgroups, edgelabel = T, resolve.root = T) %>%
+tree <- read.tree(tree_file)
+
+tree.unrooted <- as_tibble(tree) %>%
+    left_join(metadata, by = "label") %>%
+    `class<-`(c("tbl_tree", "data.frame")) %>%
+    as.treedata
+write.jtree(tree.unrooted, file = output_jtree)
+
+tree.tib <- ape::root(tree, outgroups, edgelabel = T, resolve.root = T) %>%
     drop.tip(outgroups) %>%
     as_tibble %>%
     mutate(support = suppressWarnings(as.numeric(label))) %>%
     left_join(metadata, by = "label") %>%
+    mutate(is_outgroup = ifelse(label %in% outgroups, T, NA)) %>%
     `class<-`(c("tbl_tree", "data.frame"))
 tree.phylo <- as.treedata(tree.tib)@phylo
 
@@ -117,4 +132,4 @@ p_big <- ggtree(tree, aes(color = Taxon), layout = "rectangular") +
     scale_color_manual(values = clustalx) # residues
 
 ggsave(output_file_small, p_small, height = 7, width = 8)
-ggsave(output_file_big,   p_big,   height = 6, width = 5)
+ggsave(output_file_big,   p_big,   height = 6.5, width = 5)

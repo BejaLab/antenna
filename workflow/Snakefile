@@ -5,7 +5,9 @@ min_version("6.0")
 jgi_batches ,= glob_wildcards("data/jgi/{batch}/fasta.faa")
 gem_batches ,= glob_wildcards("data/gem/split/{batch}.fasta")
 
-crt_genes = [ "CrtZ", "CrtW", "CrtR", "BCD", "Lycopene_cycl", "TIGR02734.1" ]
+crt_genes = [ 'CrtZ', 'CrtW', 'CrtR', 'BCD', 'Lycopene_cycl', 'TIGR02734.1' ]
+rhod_cog = '11G9N'
+single_copy = [ 'COG0012', 'COG0016', 'COG0018', 'COG0172', 'COG0215', 'COG0495', 'COG0525', 'COG0533', 'COG0541', 'COG0552' ]
 
 rule all:
     input:
@@ -13,6 +15,7 @@ rule all:
         "output/jgi_map.pdf", "output/jgi_sum.pdf",
         "output/gem_car.pdf", "output/gem_sum.pdf", "output/gem_tax.pdf",
         "output/rhodopsins_small.svg",
+        "output/rhodopsins.jtree",
         "output/win_wl.pdf"
 
 module blasso:
@@ -165,6 +168,7 @@ rule parse:
 
 rule plot_gem:
     input:
+        metadata = "metadata/gem/genome_metadata.tsv",
         tsv = "analysis/parse/GEM.tsv",
         crt = expand("analysis/hmmsearch/GEM-{batch}-{gene}.txt", batch = gem_batches, gene = crt_genes),
         colors = "metadata/taxa.txt"
@@ -196,10 +200,12 @@ rule plot_om_rgc:
         tsv = "analysis/parse/OM-RGC.tsv",
         metadata = "metadata/om-rgc/Salazar_et_al_2019_Suppl_Info.xlsx",
         abundance = "analysis/abundance/OM-RGC.tsv",
+        single_copy = expand("analysis/abundance-single-copy/OM-RGC-{cog}.txt", cog = single_copy),
         crtZ = "analysis/hmmsearch/OM-RGC-CrtZ.txt",
         crtZ_abundance = "analysis/hmmsearch/OM-RGC-CrtZ-abundance.tsv"
     output:
         map = "output/om_rgc_map.pdf",
+        map_percell = "output/om_rgc_map_percell.pdf",
         sum = "output/om_rgc_sum.pdf",
         dep1 = "output/om_rgc_depth_1.pdf",
         lat1 = "output/om_rgc_latitude_1.pdf",
@@ -234,7 +240,7 @@ rule om_rgc_fasta:
     conda:
         "envs/tools.yaml"
     shell:
-        "csvtool -t TAB -u TAB namedcol OM-RGC_ID,sequence {input} | tail -n+2 | seqkit tab2fx | seqkit translate -o {output}"
+        "csvcut -tc OM-RGC_ID,sequence {input} | csvformat -TK1 | seqkit tab2fx | seqkit translate -o {output}"
 
 rule om_rgc_rhodopsins:
     input:
@@ -242,9 +248,20 @@ rule om_rgc_rhodopsins:
     output:
         "analysis/gene_info/OM-RGC.txt"
     params:
-        NOG = "11G9N"
+        cog = rhod_cog
     shell:
-        "awk -v N={params.NOG} -F\\\\t 'NR==1||$4==N' {input} > {output}"
+        "csvgrep -tc OG -m {params.cog} {input} | csvformat -T > {output}"
+
+rule om_rgc_single_copy_abundance:
+    input:
+        tsv = "data/om-rgc/OM-RGC_v2.tsv",
+        abundance = "data/om-rgc/OM-RGC_v2_gene_profile_metaG.tsv"
+    output:
+        "analysis/abundance-single-copy/OM-RGC-{cog}.txt"
+    conda:
+        "envs/tools.yaml"
+    shell:
+        "csvgrep -tc OG -m {wildcards.cog} {input.tsv} | csvcut -c OM-RGC_ID | csvgrep -tc OMRGC_ID -f- {input.abundance} | csvformat -T > {output}"
 
 rule om_rgc_rhod_abundance:
     input:
@@ -273,7 +290,7 @@ rule blasso_targets_om_rgc:
     conda:
         "envs/tools.yaml"
     shell:
-        "csvtool -t TAB -u TAB namedcol OM-RGC_ID,sequence {input.txt} | tail -n+2 | seqkit tab2fx | seqkit translate | cat {input.ref} - > {output}"
+        "csvcut -tc OM-RGC_ID,sequence {input.txt} | csvformat -TK1 | seqkit tab2fx | seqkit translate | cat {input.ref} - > {output}"
 
 rule gem_gene_info:
     input:
@@ -341,7 +358,7 @@ rule extract_gem_targets:
     shell:
         "grep -v '^#' {input.txt} | cut -f1 -d' ' | sort -u | xargs seqkit faidx {input.fasta} > {output}"
 
-rule align_rhodospsins_mafft:
+rule align_rhodopsins_mafft:
     input:
         ingroup = "input/rhodopsins.fasta",
         outgroup = "input/outgroups.fasta",
@@ -351,9 +368,9 @@ rule align_rhodospsins_mafft:
     conda:
         "envs/tools.yaml"
     shell:
-        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf {input.ignore} | mafft --auto - > {output}"
+        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf <(cut -f1 {input.ignore}) | mafft --auto - > {output}"
 
-rule align_rhodospsins:
+rule align_rhodopsins:
     input:
         ingroup = "input/rhodopsins.fasta",
         outgroup = "input/outgroups.fasta",
@@ -364,13 +381,13 @@ rule align_rhodospsins:
     conda:
         "envs/tools.yaml"
     shell:
-        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf {input.ignore} | hmmalign --outformat A2M {input.hmm} - | reformat.pl a3m a2m - {output}"
+        "cat {input.ingroup} {input.outgroup} | seqkit grep -vf <(cut -f1 {input.ignore}) | hmmalign --outformat A2M {input.hmm} - | reformat.pl a3m a2m - {output}"
 
 rule trim_rhodopsins_trimal:
     input:
         "analysis/phylogeny/rhodopsins.mafft"
     output:
-        "analysis/phylogeny/rhodopsins.trim"
+        "analysis/phylogeny/rhodopsins.mafft.trim"
     params:
         gt = 0.5
     conda:
@@ -390,7 +407,7 @@ rule trim_rhodopsins:
 
 rule iqtree_rhodopsins:
     input:
-        "analysis/phylogeny/rhodopsins.a2m.trim"
+        "analysis/phylogeny/rhodopsins.mafft.trim"
     output:
         "analysis/phylogeny/rhodopsins.treefile"
     params:
@@ -409,11 +426,13 @@ rule plot_rhodopsins:
     input:
         outgroup = "input/outgroups.fasta",
         tree = "analysis/phylogeny/rhodopsins.treefile",
-        metadata = "analysis/parse/phylogeny.tsv",
-        colors = "metadata/taxa.txt"
+        tsv = "analysis/parse/phylogeny.tsv",
+        colors = "metadata/taxa.txt",
+        a2m = "analysis/phylogeny/rhodopsins.a2m"
     output:
         small = "output/rhodopsins_small.svg",
-        big = "output/rhodopsins_big.svg"
+        big = "output/rhodopsins_big.svg",
+        jtree = "output/rhodopsins.jtree"
     conda:
         "envs/r_plot.yaml"
     script:
